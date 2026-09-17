@@ -1,0 +1,13 @@
+{
+  "name": "sprint1-grupo9-accesibilidad",
+  "version": "1.0.0",
+  "description": "Sprint 1 - Testing de accesibilidad con axe-core y Lighthouse - Grupo 9 - Los Defensores del Acceso",
+  "main": "scan.js",
+  "scripts": {
+    "scan": "node scan.js"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0",
+    "@axe-core/puppeteer": "^4.10.0"
+  }
+}
