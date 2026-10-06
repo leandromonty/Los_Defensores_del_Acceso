@@ -8,7 +8,7 @@
     "test:suite": "node test-suite.js"
   },
   "dependencies": {
-    "puppeteer": "^23.0.0",
-    "@axe-core/puppeteer": "^4.10.0"
+    "@axe-core/puppeteer": "^4.10.0",
+    "puppeteer": "^25.12.0"
   }
 }

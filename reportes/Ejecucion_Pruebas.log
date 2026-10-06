@@ -1,0 +1,18 @@
+=== SUITE DE PRUEBAS DE ACCESIBILIDAD — GRUPO 9 ===
+Inicio: 2026-09-30 01:10:07
+Sistema bajo prueba: https://dequeuniversity.com/demo/mars/
+Total de casos a ejecutar: 8
+
+[2026-09-30 01:10:14] CP-01 (color-contrast · WCAG 1.4.3) — FALLA — 7 elemento(s) con violación
+[2026-09-30 01:10:15] CP-02 (image-alt · WCAG 1.1.1) — FALLA — 4 elemento(s) con violación
+[2026-09-30 01:10:15] CP-03 (label · WCAG 1.3.1 / 4.1.2) — PASA
+[2026-09-30 01:10:16] CP-04 (button-name · WCAG 4.1.2) — FALLA — 2 elemento(s) con violación
+[2026-09-30 01:10:16] CP-05 (link-name · WCAG 2.4.4) — FALLA — 8 elemento(s) con violación
+[2026-09-30 01:10:17] CP-06 (heading-order · WCAG 1.3.1) — PASA
+[2026-09-30 01:10:17] CP-07 (html-has-lang · WCAG 3.1.1) — FALLA — 1 elemento(s) con violación
+[2026-09-30 01:10:17] CP-08 (aria-valid-attr-value · WCAG 4.1.2) — PASA
+
+=== RESUMEN ===
+Fin: 2026-09-30 01:10:18
+Casos ejecutados: 8 | Pasaron: 3 | Fallaron: 5
+Resultado de la suite: FALLA (hay violaciones bloqueantes)
