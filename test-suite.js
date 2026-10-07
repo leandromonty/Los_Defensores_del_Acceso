@@ -1,3 +1,20 @@
+/**
+ * Suite de automatización — Sprint 2 (usada también en CI en el Sprint 3)
+ * Grupo 9 — "Los Defensores del Acceso"
+ *
+ * Corre 8 casos de prueba de accesibilidad (uno por regla de axe-core)
+ * contra el sistema bajo prueba, y FALLA (exit code 1) si algún caso
+ * marcado como bloqueante (blocking: true) encuentra violaciones.
+ *
+ * Uso:
+ *   npm install
+ *   npm run test:suite
+ *
+ * Genera:
+ *   reportes/Ejecucion_Pruebas.log   -> log con fecha/hora de cada caso
+ *   reportes/resultados-suite.json   -> resultado estructurado completo
+ */
+
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer");
@@ -5,7 +22,6 @@ const { AxePuppeteer } = require("@axe-core/puppeteer");
 
 const TARGET_URL = process.argv[2] || "https://dequeuniversity.com/demo/mars/";
 
-// Los 8 casos de prueba documentados en Documento_Sprint2.docx
 const CASOS = [
   { id: "CP-01", nombre: "Contraste de color suficiente", axeRule: "color-contrast", wcag: "1.4.3", blocking: true },
   { id: "CP-02", nombre: "Texto alternativo en imágenes", axeRule: "image-alt", wcag: "1.1.1", blocking: true },
@@ -48,7 +64,7 @@ async function run() {
     const page = await browser.newPage();
     await page.goto(TARGET_URL, { waitUntil: "networkidle2", timeout: 30000 });
     await page.waitForSelector("body");
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500)); // evita "Page/Frame is not ready"
 
     for (const caso of CASOS) {
       const inicio = timestamp();
@@ -68,13 +84,7 @@ async function run() {
         (paso ? "" : ` — ${violaciones} elemento(s) con violación`)
       );
 
-      resultados.push({
-        ...caso,
-        estado,
-        violaciones,
-        detalle: axeResults.violations,
-        timestamp: inicio,
-      });
+      resultados.push({ ...caso, estado, violaciones, detalle: axeResults.violations, timestamp: inicio });
     }
   } finally {
     await browser.close();
@@ -95,7 +105,6 @@ async function run() {
   console.log(`\nLog guardado en: reportes/Ejecucion_Pruebas.log`);
   console.log(`Detalle guardado en: reportes/resultados-suite.json`);
 
-  
   process.exit(huboFallaBloqueante ? 1 : 0);
 }
 

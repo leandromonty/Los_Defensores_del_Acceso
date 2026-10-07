@@ -1,0 +1,56 @@
+name: Suite de Accesibilidad (axe-core)
+
+# Sprint 3 — Grupo 9 "Los Defensores del Acceso"
+# Corre la suite de pruebas de accesibilidad automáticamente:
+#   - en cada push a main
+#   - en cada pull request hacia main
+#   - manualmente desde la pestaña Actions (workflow_dispatch)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test-suite:
+    name: Ejecutar suite de accesibilidad
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Instalar dependencias
+        run: npm ci || npm install
+
+      # Puppeteer necesita librerías del sistema para correr Chromium en Linux
+      - name: Instalar dependencias del sistema para Chromium
+        run: npx puppeteer browsers install chrome
+
+      - name: Correr la suite de pruebas de accesibilidad
+        id: suite
+        run: npm run test:suite
+        continue-on-error: true # para poder subir el reporte aunque la suite falle
+
+      - name: Subir reportes generados como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-accesibilidad-${{ github.run_number }}
+          path: |
+            reportes/Ejecucion_Pruebas.log
+            reportes/resultados-suite.json
+          retention-days: 30
+
+      - name: Marcar el job como fallido si la suite falló
+        if: steps.suite.outcome == 'failure'
+        run: |
+          echo "La suite de accesibilidad encontró violaciones bloqueantes. Ver el artifact subido para el detalle."
+          exit 1
