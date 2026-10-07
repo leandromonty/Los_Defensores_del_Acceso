@@ -52,3 +52,4 @@ node scan.js
 4. Exportar el resultado a `reportes/`.
 
 
+ 
