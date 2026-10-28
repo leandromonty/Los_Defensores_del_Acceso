@@ -1,25 +1,43 @@
 name: Suite de Accesibilidad (axe-core)
 
-# Sprint 3 — Grupo 9 "Los Defensores del Acceso"
-# Corre la suite de pruebas de accesibilidad automáticamente:
-#   - en cada push a main
-#   - en cada pull request hacia main
-#   - manualmente desde la pestaña Actions (workflow_dispatch)
+# Sprint 4 — Grupo 9 "Los Defensores del Acceso"
+# Pipeline completo:
+#   1) tests unitarios de la lógica de evaluación (rápidos, sin navegador)
+#   2) suite de accesibilidad contra el sitio bajo prueba
+#   3) reportes (log, JSON, HTML) subidos como artifact + resumen en la corrida
+#
+# Se dispara solo:
+#   - en cada push y pull request a main
+#   - todos los lunes a las 09:00 hora Argentina (12:00 UTC), para detectar
+#     cambios en el sitio aunque nadie toque el repo
+#   - manualmente desde la pestaña Actions, eligiendo el modo
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: "0 12 * * 1"
   workflow_dispatch:
+    inputs:
+      modo:
+        description: "baseline (falla solo ante regresiones) o estricto (falla ante cualquier violación)"
+        required: false
+        default: "baseline"
+        type: choice
+        options:
+          - baseline
+          - estricto
 
 jobs:
-  test-suite:
-    name: Ejecutar suite de accesibilidad
+  pruebas:
+    name: Unit tests + suite de accesibilidad
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
-      - name: Descargar el código del repositorio
+      - name: Descargar el código
         uses: actions/checkout@v4
 
       - name: Configurar Node.js
@@ -31,26 +49,32 @@ jobs:
       - name: Instalar dependencias
         run: npm ci || npm install
 
-      # Puppeteer necesita librerías del sistema para correr Chromium en Linux
-      - name: Instalar dependencias del sistema para Chromium
+      - name: Tests unitarios de la lógica de evaluación
+        run: npm run test:unit
+
+      - name: Instalar Chrome para Puppeteer
         run: npx puppeteer browsers install chrome
 
-      - name: Correr la suite de pruebas de accesibilidad
+      - name: Suite de accesibilidad
         id: suite
+        env:
+          SUITE_MODO: ${{ github.event.inputs.modo || 'baseline' }}
         run: npm run test:suite
-        continue-on-error: true # para poder subir el reporte aunque la suite falle
+        continue-on-error: true # así siempre llegamos a subir el reporte
 
-      - name: Subir reportes generados como artifact
+      - name: Subir reportes (artifact)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: reporte-accesibilidad-${{ github.run_number }}
-          path: |
-            reportes/Ejecucion_Pruebas.log
-            reportes/resultados-suite.json
+          path: reportes/
+          if-no-files-found: warn
           retention-days: 30
 
-      - name: Marcar el job como fallido si la suite falló
+      - name: Marcar el job según el resultado de la suite
         if: steps.suite.outcome == 'failure'
         run: |
-          echo "La suite de accesibilidad encontró violaciones bloqueantes. Ver el artifact subido para el detalle."
+          echo "La suite terminó con código distinto de 0:"
+          echo "  1 = hay regresiones o fallas bloqueantes (ver el resumen de la corrida)"
+          echo "  2 = error de infraestructura (sitio caído o navegador roto): revisar el log"
           exit 1

@@ -1,11 +1,14 @@
 {
   "name": "sprint1-grupo9-accesibilidad",
-  "version": "1.0.0",
-  "description": "Sprint 1-3 - Testing de accesibilidad con axe-core y Lighthouse - Grupo 9 - Los Defensores del Acceso",
-  "main": "scan.js",
+  "version": "4.0.0",
+  "description": "Testing de accesibilidad con axe-core - Grupo 9 - Los Defensores del Acceso",
+  "main": "test-suite.js",
   "scripts": {
     "scan": "node scan.js",
-    "test:suite": "node test-suite.js"
+    "test:unit": "node --test test/evaluar.test.js",
+    "test:suite": "node test-suite.js",
+    "test:strict": "node test-suite.js --modo=estricto",
+    "test": "npm run test:unit && npm run test:suite"
   },
   "dependencies": {
     "puppeteer": "^23.0.0",

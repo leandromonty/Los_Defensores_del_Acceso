@@ -1,0 +1,11 @@
+{
+  "_comentario": "Defectos conocidos de MarsCommuter (sitio de práctica de Deque, con errores intencionales). Valores tomados de la corrida real del 30/09/2026 (Sprint 2). Una regla que pasa de estos números es una REGRESION y rompe el pipeline.",
+  "color-contrast": 7,
+  "image-alt": 4,
+  "label": 0,
+  "button-name": 2,
+  "link-name": 8,
+  "heading-order": 0,
+  "html-has-lang": 1,
+  "aria-valid-attr-value": 0
+}
