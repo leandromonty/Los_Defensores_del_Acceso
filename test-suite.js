@@ -81,7 +81,8 @@ async function run() {
     process.exit(2);
   }
 
-  const outDir = path.join(__dirname, "reportes");
+  // SUITE_OUT_DIR permite redirigir los reportes (lo usa el benchmark para no ensuciar reportes/)
+  const outDir = process.env.SUITE_OUT_DIR || path.join(__dirname, "reportes");
   fs.mkdirSync(outDir, { recursive: true });
 
   const baseline = USAR_BASELINE

@@ -1,55 +1,57 @@
-# Sprint 1 — Grupo 9 — "Los Defensores del Acceso"
+# Los Defensores del Acceso — Testing de accesibilidad automatizado
 
-Testing de accesibilidad web con **axe-core** y **Lighthouse**.
+Grupo 9 · IES Alfredo Coviello · Sprint 4 (final)
+Integrantes: Juan García, Nahuel González, Leandro Montivero, Juan Sosa.
+Cliente: QualityTech Solutions · Sistema bajo prueba: MarsCommuter (https://dequeuniversity.com/demo/mars/)
 
-## Sistema bajo prueba
+Suite de accesibilidad con axe-core y Puppeteer: 8 casos (4 principios POUR, 6 criterios WCAG 2.2),
+con baseline de defectos conocidos, reintentos, reportes automáticos y pipeline en GitHub Actions.
 
-- **Sitio:** MarsCommuter Demo (Deque University)
-- **URL:** https://dequeuniversity.com/demo/mars/
-- Sitio público diseñado explícitamente por Deque para practicar auditorías de accesibilidad — no requiere autorización adicional para ser testeado.
+## Uso
 
-## Requisitos
+    npm install
+    npm run test:unit     # 17 pruebas unitarias (lógica de evaluación)
+    npm run test:suite    # suite sobre MarsCommuter (modo baseline)
+    npm run test:strict   # modo estricto: cualquier violación falla
+    npm run benchmark     # compara la suite anterior (8 análisis) con la nueva (1 análisis)
 
-- Node.js 18 o superior ([nodejs.org](https://nodejs.org))
-- Google Chrome (para usar Lighthouse desde DevTools)
-- Opcional: extensión [axe DevTools](https://chromewebstore.google.com/) para Chrome
+Opciones: `--url=<sitio>`, `--modo=baseline|estricto`, `--sin-baseline`.
+Variables: `SUITE_MODO`, `SUITE_URL`, `SUITE_OUT_DIR`.
 
-## Instalación
+## Códigos de salida
 
-```bash
-git clone <https://github.com/leandromonty/Los_Defensores_del_Acceso>
-npm install
-```
+| Código | Significado |
+|---|---|
+| 0 | Sin regresiones ni fallas bloqueantes |
+| 1 | Regresión (o falla en modo estricto) |
+| 2 | Error de infraestructura (sitio caído, navegador roto) |
 
-## Ejecución del primer artefacto (escaneo automatizado con axe-core)
+## Estados de cada caso
 
-```bash
-npm run scan
-```
+PASA · DEFECTO_CONOCIDO (igual o menos que `baseline.json`) · REGRESIÓN (más que el baseline, bloquea) · FALLA (modo estricto, bloquea).
 
-Esto abre el sitio MarsCommuter en un navegador headless, corre axe-core sobre el DOM, imprime un resumen en consola y guarda el reporte completo en `reportes/reporte-axe.json`.
+## Reportes
 
-Para escanear otra URL:
+Se generan en `reportes/`: `Ejecucion_Pruebas.log`, `resultados-suite.json` y `reporte.html`.
 
-```bash
-node scan.js 
-```
+## CI/CD
 
+`.github/workflows/accesibilidad.yml` se ejecuta en cada push y pull request a `main`, todos los lunes
+a las 12:00 UTC y manualmente (con selección de modo). Instala dependencias y Chrome, corre los tests
+unitarios, corre la suite, publica los reportes como artefacto y termina en error si hubo regresión.
 
-## Escaneo manual con Lighthouse (complementario)
+## Resultados medidos
 
-1. Abrir el sitio en Google Chrome.
-2. Abrir DevTools (`F12`) → pestaña **Lighthouse**.
-3. Tildar únicamente la categoría **Accessibility**.
-4. Click en **Analyze page load**.
-5. Exportar el reporte (HTML o JSON) a la carpeta `reportes/`.
+- Ejecución real sobre MarsCommuter (28/10/2026): 3 pasan, 5 defectos conocidos, 0 regresiones, 1 análisis de axe, 0 reintentos, 16,3 s.
+- Pruebas unitarias: 17/17.
+- Benchmark (página local, sin latencia de red, mediana de 5 corridas): suite anterior 6,50 s, suite nueva 3,96 s (−39 %), mismos hallazgos.
 
-## Escaneo manual con axe DevTools (complementario)
+## Estructura
 
-1. Instalar la extensión axe DevTools en Chrome.
-2. Abrir el sitio y la pestaña **axe DevTools** dentro de DevTools.
-3. Click en **Scan ALL of my page**.
-4. Exportar el resultado a `reportes/`.
-
-
- 
+    test-suite.js            suite final
+    lib/evaluar.js           lógica de evaluación (probada sin navegador)
+    lib/reporte.js           generador del reporte HTML
+    baseline.json            defectos conocidos de MarsCommuter
+    test/evaluar.test.js     pruebas unitarias
+    benchmark/               suite anterior congelada, página de prueba y script de medición
+    .github/workflows/       pipeline de CI/CD

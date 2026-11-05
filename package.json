@@ -8,6 +8,7 @@
     "test:unit": "node --test test/evaluar.test.js",
     "test:suite": "node test-suite.js",
     "test:strict": "node test-suite.js --modo=estricto",
+    "benchmark": "node benchmark/benchmark.js",
     "test": "npm run test:unit && npm run test:suite"
   },
   "dependencies": {
